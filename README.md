@@ -35,7 +35,8 @@ positional arguments:
 
 optional arguments:
   -h, --help         show this help message and exit
-  --minClip MINCLIP  Required total (left + right) clip length.
+  --minClip MINCLIP  Required clip length (left + right). If >= 1 total
+                     number; if < 1 relative to read length.
   --invert           Output only soft-clipped SAM records and ignore the good
                      ones.
 ```

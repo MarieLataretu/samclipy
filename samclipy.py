@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import re
 import argparse
@@ -7,7 +9,7 @@ def mainArgs():
     # Input options
     parser.add_argument('samfile', nargs='?', type=argparse.FileType('rU'), default=sys.stdin)
     # parser.add_argument('--fai',type=str,required=True,help='Path to fai index for reference fasta. Index fasta using `samtools faidx FASTA`')
-    parser.add_argument('--minClip',type=int,default=1,help='Required total (left + right) clip length.')
+    parser.add_argument('--minClip',type=float,default=1,help='Required clip length (left + right). If >= 1 total number; if < 1 relative to read length.')
     parser.add_argument('--invert',default=False,action='store_true',help='Output only soft-clipped SAM records and ignore the good ones.')
     args = parser.parse_args()
     return args
@@ -103,15 +105,29 @@ def main():
             sam_rec = line.split('\t')
             if "S" in sam_rec[SAM_CIGAR] and not "H" in sam_rec[SAM_CIGAR]:
                 leftClipLen,rightClipLen = checkClips(sam_rec[SAM_CIGAR])
-                # alnLen = lenCIGAR(sam_rec[SAM_CIGAR])
-                if sum(filter(None, [leftClipLen, rightClipLen])) < args.minClip:
-                    log_passed += 1
-                    if not args.invert:
-                        print(line)
-                else:
-                    log_removed += 1
-                    if args.invert:
-                        print(line)
+                clipSum = sum(filter(None, [leftClipLen, rightClipLen]))
+                if args.minClip >= 1: # check absolute number of soft-clipped positions 
+                    if clipSum < args.minClip:
+                        # S but not to much in sum
+                        log_passed += 1
+                        if not args.invert:
+                            print(line)
+                    else:
+                        # to much soft-clipping
+                        log_removed += 1
+                        if args.invert:
+                            print(line)
+                else: # check soft-clipped positions relative to alignment length
+                    readLen = len(sam_rec[SAM_SEQ])
+                    relativeClipLen = clipSum/readLen
+                    if relativeClipLen < args.minClip:
+                        log_passed += 1
+                        if not args.invert:
+                            print(line)
+                    else:
+                        log_removed += 1
+                        if args.invert:
+                            print(line)
             else:
                 log_kept += 1
                 if not args.invert:
