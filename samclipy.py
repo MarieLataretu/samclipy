@@ -136,6 +136,8 @@ def main():
     log(f"Header contained {log_header} lines")
     if args.invert:
         log(f"Printed {log_removed} clipped SAM records")
+    else:
+        log(f"Printed {log_passed + log_kept} SAM records")
     log('Done.')
 
 if __name__ == '__main__':
