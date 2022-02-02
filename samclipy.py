@@ -49,28 +49,28 @@ def checkClips(SAM_CIGAR):
         rightClipLen = int(CIGARlist[-1][0])
     return (leftClipLen,rightClipLen)
 
-# def lenCIGAR(SAM_CIGAR):
-#     """
-#     Calculate length of alignment in reference sequence as sum of 
-#     match, read-deletion, splice, mismatch, and read-match block values.
-#     Ignore read-insertions, padding, hard and soft clip blocks.
-#     """
-#     alnLen = 0
-#     CIGARlist = splitCIGAR(SAM_CIGAR)
-#     for x in CIGARlist: # i.e. = [(174,M),(76,S)]
-#         if x[1] in set(['D','M','N','X','=']):
-#             alnLen += x[0]
-#     #Ignore operators in set('P','H','S','I')
-#     return alnLen
+def lenCIGAR(SAM_CIGAR):
+    """
+    Calculate length of alignment in reference sequence as sum of 
+    match, read-deletion, splice, mismatch, and read-match block values.
+    Ignore read-insertions, padding, hard and soft clip blocks.
+    """
+    alnLen = 0
+    CIGARlist = splitCIGAR(SAM_CIGAR)
+    for x in CIGARlist: # i.e. = [(174,M),(76,S)]
+        if x[1] in set(['D','M','N','X','=']):
+            alnLen += x[0]
+    #Ignore operators in set('P','H','S','I')
+    return alnLen
 
-# def fai_to_dict(fai_file):
-#     ref_len_dict = {}
-#     with open(fai_file, 'r') as fai:
-#         for line in fai:
-#             contig = line.split('\t')[0]
-#             len = line.split('\t')[1]
-#             ref_len_dict[contig] = len
-#     return ref_len_dict
+def fai_to_dict(fai_file):
+    ref_len_dict = {}
+    with open(fai_file, 'r') as fai:
+        for line in fai:
+            contig = line.split('\t')[0]
+            len = line.split('\t')[1]
+            ref_len_dict[contig] = len
+    return ref_len_dict
 
 def main():
     # Get cmd line args
